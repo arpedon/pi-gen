@@ -1,0 +1,3 @@
+at-spi2-core i2c-tools build-essential  libatlas-base-dev
+# Docker dependencies
+ca-certificates curl
