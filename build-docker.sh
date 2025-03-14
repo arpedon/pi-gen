@@ -7,7 +7,7 @@ DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
 BUILD_OPTS="$*"
 
 # Allow user to override docker command
-DOCKER=${DOCKER:-docker}
+DOCKER="${DOCKER:-docker}"
 
 # Ensure that default docker command is not set up in rootless mode
 if \
@@ -86,11 +86,11 @@ ${DOCKER} build --build-arg BASE_IMAGE=debian:bullseye -t pi-gen "${DIR}"
 
 if [ "${CONTAINER_EXISTS}" != "" ]; then
   DOCKER_CMDLINE_NAME="${CONTAINER_NAME}_cont"
-  DOCKER_CMDLINE_PRE="--rm"
+  DOCKER_CMDLINE_PRE="--rm --mount type=bind,src=/run/host-services/ssh-auth.sock,target=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock"
   DOCKER_CMDLINE_POST="--volumes-from=${CONTAINER_NAME}"
 else
   DOCKER_CMDLINE_NAME="${CONTAINER_NAME}"
-  DOCKER_CMDLINE_PRE=""
+  DOCKER_CMDLINE_PRE="--mount type=bind,src=/run/host-services/ssh-auth.sock,target=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock"
   DOCKER_CMDLINE_POST=""
 fi
 
