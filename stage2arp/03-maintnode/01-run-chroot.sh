@@ -44,4 +44,4 @@ fi
 make -C tools clean
 
 cd "/home/$FIRST_USER_NAME/maintnode"
-/root/.local/bin/poetry install --only main
+poetry install --only main

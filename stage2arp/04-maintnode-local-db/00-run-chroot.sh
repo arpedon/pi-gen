@@ -2,9 +2,9 @@
 set -ex
 
 cd "/home/$FIRST_USER_NAME/maintnode-local-db"
-/root/.local/bin/poetry install --no-root --only main
+poetry install --no-root --only main
 
-export MAINTNODE_LOCAL_DB_BIN_PATH=$(/root/.local/bin/poetry env info -p)/bin
+export MAINTNODE_LOCAL_DB_BIN_PATH=$(poetry env info -p)/bin
 
 cp "/home/$FIRST_USER_NAME/maintnode-local-db/maintnode-local-db.service" "/etc/systemd/system/"
 cp "/home/$FIRST_USER_NAME/maintnode-local-db/maintnode-local-db-worker.service" "/etc/systemd/system/"
