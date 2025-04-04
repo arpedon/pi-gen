@@ -1,0 +1,1 @@
+NODE_RED_OPTIONS=--userDir=/home/pi/.node-red/
