@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Scripts Frontend</title>
+</head>
+<body>
+    <h1>Setup Scripts Frontend</h1>
+
+    <h2>Maintnode Setup</h2>
+    <form id="maintnode-form">
+        <label for="uuid">UUID:</label>
+        <input type="text" id="uuid" name="uuid" required><br>
+        <label for="server">Server:</label>
+        <input type="text" id="server" name="server" required><br>
+        <button type="submit">Run Maintnode Setup</button>
+    </form>
+    <pre id="maintnode-output"></pre>
+
+    <h2>Network Setup</h2>
+    <form id="network-form">
+        <label for="ip">IP Address:</label>
+        <input type="text" id="ip" name="ip" required><br>
+        <label for="netmask">Netmask:</label>
+        <input type="text" id="netmask" name="netmask" required><br>
+        <label for="gateway">Gateway:</label>
+        <input type="text" id="gateway" name="gateway" required><br>
+        <label for="dns">DNS:</label>
+        <input type="text" id="dns" name="dns" required><br>
+        <button type="submit">Run Network Setup</button>
+    </form>
+    <pre id="network-output"></pre>
+
+    <script>
+        document.getElementById("maintnode-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch("/run-maintnode-setup", {
+                method: "POST",
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById("maintnode-output").textContent = JSON.stringify(result, null, 2);
+        });
+
+        document.getElementById("network-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch("/run-network-setup", {
+                method: "POST",
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById("network-output").textContent = JSON.stringify(result, null, 2);
+        });
+    </script>
+</body>
+</html>
