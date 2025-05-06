@@ -1,12 +1,14 @@
 #!/bin/bash -e
 
 # Enable debugging for troubleshooting
-set -ex
+if [[ "$DEBUG" == "true" ]]; then
+  set -ex
+fi
 
 # Constants
 DEFAULT_MECHBASE_SERVER="https://mechbase.arpedon.com"
 CONFIG_FILE_PATH="/home/pi/config/maintnode.yaml"
-SYSTEMD_DIR="files"
+SYSTEMD_DIR="/usr/local/share/maintnode-setup/systemd"
 SERVICE_NAME="maintnode-agent"
 PING_TARGET="8.8.8.8"
 
@@ -59,6 +61,7 @@ substitute_systemd_files() {
   for file in $(ls "$SYSTEMD_DIR"); do
     envsubst <<< "$uuid $server" < "$SYSTEMD_DIR/$file" | sudo tee "/etc/systemd/system/$file" > /dev/null
   done
+  systemctl daemon-reload
 }
 
 # Restart and check service status
