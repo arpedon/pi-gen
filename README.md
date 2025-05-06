@@ -1,3 +1,17 @@
+# Arpedon pi-gen
+
+To build:
+
+```
+make build
+```
+
+For quicker tries:
+
+```
+make dev
+```
+
 # pi-gen
 
 Tool used to create Raspberry Pi OS images, and custom images based on Raspberry Pi OS,
