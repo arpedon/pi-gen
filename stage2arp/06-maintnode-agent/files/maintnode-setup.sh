@@ -84,6 +84,7 @@ wait_for_config_file() {
     sleep 1
   done
   echo "Config file is present and filled."
+  systemctl restart maintnode-local-db maintnode-local-db-worker
 }
 
 # Main script logic

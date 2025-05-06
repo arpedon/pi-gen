@@ -12,6 +12,9 @@ For quicker tries:
 make dev
 ```
 
+
+sudo maintnode-setup fc4637ad-c5bd-4b97-948d-0e2b097aa18c https://mechbase.arpedon.com 
+
 # pi-gen
 
 Tool used to create Raspberry Pi OS images, and custom images based on Raspberry Pi OS,
