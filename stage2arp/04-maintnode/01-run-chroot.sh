@@ -44,4 +44,4 @@ fi
 make -C tools clean
 
 cd "/home/$FIRST_USER_NAME/maintnode"
-poetry install --only main
+sudo -u ${FIRST_USER_NAME} -H bash -c "cd /home/${FIRST_USER_NAME}/maintnode-local-db && poetry install --only main"
