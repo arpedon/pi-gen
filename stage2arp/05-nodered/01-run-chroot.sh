@@ -2,7 +2,7 @@
 
 set -ex
 
-mkdir -p /home/${FIRST_USER_NAME}/.node-red && cd /home/${FIRST_USER_NAME}/.node-red
+cd /home/${FIRST_USER_NAME}/.node-red
 chown -R pi:pi /home/${FIRST_USER_NAME}/.node-red
 /tmp/update-nodejs-and-nodered.sh --confirm-root --nodered-user=pi --confirm-install --confirm-pi --no-init --node18
 npm install node-red-dashboard \
