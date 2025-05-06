@@ -1,0 +1,11 @@
+[Unit]
+Description=MaintNode agent
+
+[Service]
+User=pi
+Group=www-data
+WorkingDirectory=/home/pi
+ExecStart=/usr/local/bin/maintnode-agent $MECHBASE_SERVER/api/maintnode-configs/$MAINTNODE_CONFIG_UUID /home/pi/config/maintnode.yaml
+
+[Install]
+WantedBy=multi-user.target
