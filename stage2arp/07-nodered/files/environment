@@ -1,1 +1,1 @@
-NODE_RED_OPTIONS=--userDir=/home/pi/.node-red/
+NODE_OPTIONS=--userDir /home/${FIRST_USER_NAME}/.node-red/
