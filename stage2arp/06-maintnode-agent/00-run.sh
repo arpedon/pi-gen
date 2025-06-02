@@ -4,7 +4,7 @@ set -ex
 install -m 644 files/maintnode-agent_0.1.1_linux_arm64.tar.gz "${ROOTFS_DIR}/tmp/maintnode-agent.tar.gz"
 mkdir -p "${ROOTFS_DIR}/usr/local/share/maintnode-setup/systemd"
 mkdir -p "${ROOTFS_DIR}/home/${FIRST_USER_NAME}/config"
--R ${FIRST_USER_NAME}:${FIRST_USER_NAME} "${ROOTFS_DIR}/home/${FIRST_USER_NAME}/config"
+chown -R ${FIRST_USER_NAME}:${FIRST_USER_NAME} "${ROOTFS_DIR}/home/${FIRST_USER_NAME}/config"
 install -m 644 files/maintnode-agent.service "${ROOTFS_DIR}/usr/local/share/maintnode-setup/systemd/maintnode-agent.service"
 install -m 755 files/maintnode-setup.sh "${ROOTFS_DIR}/usr/local/bin/maintnode-setup"
 
