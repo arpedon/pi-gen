@@ -1,7 +1,7 @@
 export PIGEN_DOCKER_OPTS=-v /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock
 
 clean: clean_skips
-	docker rm -v pigen_work
+	docker rm -v pigen_work || true
 
 skip_stages:
 	mkdir -p stage3 stage4 stage5
