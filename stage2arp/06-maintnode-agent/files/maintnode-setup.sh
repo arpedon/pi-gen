@@ -16,10 +16,15 @@ PING_TARGET="8.8.8.8"
 
 # Print usage instructions
 print_usage() {
-  echo "Usage: $0 <MAINTNODE_CONFIG_UUID> <MECHBASE_SERVER>"
-  echo "Example MECHBASE_SERVER values:"
-  echo "  - $DEFAULT_MECHBASE_SERVER (default cloud server)"
-  echo "  - http://<on-premise-server-address> (for on-premise installations)"
+  echo "Usage: $0 --maintnode-config-uuid=<uuid> [--mechbase-url=<url>] --tailscale-auth-key=<key>"
+  echo "Required parameters:"
+  echo "  --maintnode-config-uuid=<uuid>  UUID for maintnode configuration"
+  echo "  --tailscale-auth-key=<key>      Tailscale authentication key"
+  echo "Optional parameters:"
+  echo "  --mechbase-url=<url>            Mechbase server URL (default: $DEFAULT_MECHBASE_SERVER)"
+  echo ""
+  echo "Example:"
+  echo "  $0 --maintnode-config-uuid=12345678-1234-1234-1234-123456789abc --tailscale-auth-key=tskey-auth-xxx --mechbase-url=https://custom.server.com"
 }
 
 # Validate UUID format
@@ -57,9 +62,9 @@ substitute_systemd_files() {
 
   export MAINTNODE_CONFIG_UUID="$uuid"
   export MECHBASE_SERVER="$server"
-  
+
   for file in $(ls "$SYSTEMD_DIR"); do
-    envsubst <<< "$uuid $server" < "$SYSTEMD_DIR/$file" | sudo tee "/etc/systemd/system/$file" > /dev/null
+    envsubst < "$SYSTEMD_DIR/$file" > "/etc/systemd/system/$file"
   done
   systemctl daemon-reload
 }
@@ -72,6 +77,19 @@ restart_and_check_service() {
     echo "$service service is running."
   else
     echo "$service service is not running. Exiting."
+    exit 1
+  fi
+}
+
+# Setup Tailscale with auth key
+setup_tailscale() {
+  local auth_key=$1
+  echo "Setting up Tailscale with provided auth key..."
+  if command -v tailscale &> /dev/null; then
+    tailscale up --auth-key="$auth_key"
+    echo "Tailscale setup completed."
+  else
+    echo "Error: Tailscale is not installed."
     exit 1
   fi
 }
@@ -89,13 +107,47 @@ wait_for_config_file() {
 
 # Main script logic
 
-# Get inputs
-MAINTNODE_CONFIG_UUID=$1
-MECHBASE_SERVER=$2
+# Initialize variables
+MAINTNODE_CONFIG_UUID=""
+MECHBASE_SERVER="$DEFAULT_MECHBASE_SERVER"
+TAILSCALE_AUTH_KEY=""
 
-# Validate inputs
-if [[ -z "$MAINTNODE_CONFIG_UUID" || -z "$MECHBASE_SERVER" ]]; then
-  echo "Error: Both MAINTNODE_CONFIG_UUID and MECHBASE_SERVER must be provided as arguments."
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --maintnode-config-uuid=*)
+      MAINTNODE_CONFIG_UUID="${1#*=}"
+      shift
+      ;;
+    --mechbase-url=*)
+      MECHBASE_SERVER="${1#*=}"
+      shift
+      ;;
+    --tailscale-auth-key=*)
+      TAILSCALE_AUTH_KEY="${1#*=}"
+      shift
+      ;;
+    -h|--help)
+      print_usage
+      exit 0
+      ;;
+    *)
+      echo "Error: Unknown parameter $1"
+      print_usage
+      exit 1
+      ;;
+  esac
+done
+
+# Validate required inputs
+if [[ -z "$MAINTNODE_CONFIG_UUID" ]]; then
+  echo "Error: --maintnode-config-uuid parameter is required."
+  print_usage
+  exit 1
+fi
+
+if [[ -z "$TAILSCALE_AUTH_KEY" ]]; then
+  echo "Error: --tailscale-auth-key parameter is required."
   print_usage
   exit 1
 fi
@@ -106,6 +158,9 @@ validate_url "$MECHBASE_SERVER"
 # Check internet connection
 check_internet_connection
 
+# Setup Tailscale
+setup_tailscale "$TAILSCALE_AUTH_KEY"
+
 # Substitute variables in systemd files
 substitute_systemd_files "$MAINTNODE_CONFIG_UUID" "$MECHBASE_SERVER"
 
@@ -114,3 +169,9 @@ restart_and_check_service "$SERVICE_NAME"
 
 # Wait for the configuration file
 wait_for_config_file "$CONFIG_FILE_PATH"
+
+# Enable overlay filesystem (0 enable, 1 disable)
+raspi-config nonint do_overlayfs 0
+
+echo "Maintnode setup completed successfully."
+echo "Please reboot your system to apply all changes."

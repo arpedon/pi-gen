@@ -12,7 +12,7 @@ export MAINTNODE_LOCAL_DB_BIN_PATH=$(sudo -u ${FIRST_USER_NAME} -H bash -c "cd /
 mkdir -p "/media/data"
 
 for file in $(ls systemd); do
-  envsubst <<< "$MAINTNODE_LOCAL_DB_BIN_PATH" < "systemd/$file" | sudo tee "/etc/systemd/system/$file" > /dev/null
+  envsubst '$MAINTNODE_LOCAL_DB_BIN_PATH$FIRST_USER_NAME' < "systemd/$file" | sudo tee "/etc/systemd/system/$file" > /dev/null
 done
 
 systemctl enable maintnode-local-db maintnode-local-db-worker
