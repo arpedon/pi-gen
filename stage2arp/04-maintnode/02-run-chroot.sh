@@ -4,10 +4,12 @@ set -ex
 cd "/home/$FIRST_USER_NAME/maintnode"
 
 # ULDAQ
-cd "installation/library/"
+cd "/home/$FIRST_USER_NAME/"
 tar -xvf uldaq.tar.gz
 cd libuldaq-1.2.0
 ./configure && make && make install
+rm uldaq.tar.gz
+rm -rf libuldaq-1.2.0
 
 # DaqHATs
 cd "/home/$FIRST_USER_NAME/daqhats"
