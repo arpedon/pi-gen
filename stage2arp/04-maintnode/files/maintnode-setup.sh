@@ -16,15 +16,16 @@ PING_TARGET="8.8.8.8"
 
 # Print usage instructions
 print_usage() {
-  echo "Usage: $0 --maintnode-config-uuid=<uuid> [--mechbase-url=<url>] --tailscale-auth-key=<key>"
+  echo "Usage: $0 --maintnode-config-uuid=<uuid> [--mechbase-url=<url>] --tailscale-auth-key=<key> [--readonly-filesystem=<true|false>]"
   echo "Required parameters:"
   echo "  --maintnode-config-uuid=<uuid>  UUID for maintnode configuration"
   echo "  --tailscale-auth-key=<key>      Tailscale authentication key"
   echo "Optional parameters:"
   echo "  --mechbase-url=<url>            Mechbase server URL (default: $DEFAULT_MECHBASE_SERVER)"
+  echo "  --readonly-filesystem=<bool>    Enable readonly filesystem overlay (default: true)"
   echo ""
   echo "Example:"
-  echo "  $0 --maintnode-config-uuid=12345678-1234-1234-1234-123456789abc --tailscale-auth-key=tskey-auth-xxx --mechbase-url=https://custom.server.com"
+  echo "  $0 --maintnode-config-uuid=12345678-1234-1234-1234-123456789abc --tailscale-auth-key=tskey-auth-xxx --mechbase-url=https://custom.server.com --readonly-filesystem=false"
 }
 
 # Validate UUID format
@@ -129,6 +130,7 @@ wait_for_config_file() {
 MAINTNODE_CONFIG_UUID=""
 MECHBASE_SERVER="$DEFAULT_MECHBASE_SERVER"
 TAILSCALE_AUTH_KEY=""
+READONLY_FILESYSTEM="true"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -143,6 +145,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --tailscale-auth-key=*)
       TAILSCALE_AUTH_KEY="${1#*=}"
+      shift
+      ;;
+    --readonly-filesystem=*)
+      READONLY_FILESYSTEM="${1#*=}"
       shift
       ;;
     -h|--help)
@@ -192,8 +198,13 @@ restart_and_check_service "$SERVICE_NAME"
 # Wait for the configuration file
 wait_for_config_file "$CONFIG_FILE_PATH"
 
-# Enable overlay filesystem (0 enable, 1 disable)
-raspi-config nonint do_overlayfs 0
+# Enable or disable overlay filesystem based on the parameter
+if [[ "$READONLY_FILESYSTEM" == "true" ]]; then
+  echo "Enabling readonly filesystem overlay..."
+  raspi-config nonint do_overlayfs 0
+else
+  echo "Readonly filesystem overlay disabled."
+fi
 
 echo "Maintnode setup completed successfully."
 echo "Please reboot your system to apply all changes."
