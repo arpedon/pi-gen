@@ -72,7 +72,8 @@ substitute_systemd_files() {
 # Restart and check service status
 restart_and_check_service() {
   local service=$1
-  systemctl restart "$service"
+  systemctl enable "$service"
+  systemctl start "$service"
   if systemctl is-active --quiet "$service"; then
     echo "$service service is running."
   else
@@ -93,6 +94,23 @@ setup_tailscale() {
     exit 1
   fi
 }
+
+# Setup FRPC with MAINTNODE_ID
+setup_frpc() {
+  local maintnode_id=$1
+  local frpc_config="/usr/local/etc/frp/frpc.ini"
+
+  echo "Setting up FRPC with MAINTNODE_ID: $maintnode_id"
+
+  if [ -f "$frpc_config" ]; then
+    export MAINTNODE_ID="$maintnode_id"
+    envsubst '$MAINTNODE_ID' < "$frpc_config" > "$frpc_config.tmp" && mv "$frpc_config.tmp" "$frpc_config"
+    echo "FRPC configuration updated successfully."
+  else
+    echo "Warning: FRPC configuration file not found at $frpc_config"
+  fi
+}
+
 
 # Wait for the configuration file to be downloaded
 wait_for_config_file() {
@@ -160,6 +178,10 @@ check_internet_connection
 
 # Setup Tailscale
 setup_tailscale "$TAILSCALE_AUTH_KEY"
+
+# Setup FRPC
+setup_frpc "$HOSTNAME"
+restart_and_check_service "frpc"
 
 # Substitute variables in systemd files
 substitute_systemd_files "$MAINTNODE_CONFIG_UUID" "$MECHBASE_SERVER"

@@ -2,12 +2,10 @@
 set -ex
 
 install -m 644 files/maintnode-agent_0.1.1_linux_arm64.tar.gz "${ROOTFS_DIR}/tmp/maintnode-agent.tar.gz"
-mkdir -p "${ROOTFS_DIR}/usr/local/share/maintnode-setup/systemd"
 mkdir -p "${ROOTFS_DIR}/home/${FIRST_USER_NAME}/config"
 on_chroot << EOF
 chown -R ${FIRST_USER_NAME}:${FIRST_USER_NAME} "/home/${FIRST_USER_NAME}/config"
 EOF
-install -m 755 files/maintnode-setup.sh "${ROOTFS_DIR}/usr/local/bin/maintnode-setup"
 envsubst '$FIRST_USER_NAME' < files/maintnode-agent.service > "${ROOTFS_DIR}/usr/local/share/maintnode-setup/systemd/maintnode-agent.service"
 
 on_chroot << EOF
@@ -16,4 +14,3 @@ tar -xzf maintnode-agent.tar.gz
 ls -lR
 mv maintnode-agent /usr/local/bin/maintnode-agent
 EOF
-echo '35 */4 * * * systemctl restart maintnode-local-db-worker.service' >> "${ROOTFS_DIR}/var/spool/cron/crontabs/root"

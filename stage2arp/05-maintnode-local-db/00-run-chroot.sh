@@ -18,5 +18,3 @@ done
 systemctl enable maintnode-local-db maintnode-local-db-worker
 
 echo '35 */4 * * * systemctl restart maintnode-local-db-worker.service' >> "/var/spool/cron/crontabs/root"
-
-
