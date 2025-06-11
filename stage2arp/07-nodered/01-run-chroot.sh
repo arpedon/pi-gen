@@ -3,7 +3,7 @@
 set -ex
 
 cd /home/${FIRST_USER_NAME}/.node-red
-/tmp/update-nodejs-and-nodered.sh --confirm-root --nodered-user=pi --confirm-install --confirm-pi --no-init --node18
+/tmp/update-nodejs-and-nodered.sh --nodered-user=${FIRST_USER_NAME} --confirm-install --confirm-pi --no-init --node18
 npm install node-red-dashboard \
   node-red-contrib-modbus \
   node-red-contrib-opcua \

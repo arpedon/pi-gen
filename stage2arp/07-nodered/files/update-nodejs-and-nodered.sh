@@ -206,34 +206,6 @@ if [[ -e /mnt/dietpi_userdata && "$ONDIET" == "y" ]]; then
     CONFIRM_PI="y"
 fi
 
-if [ "$EUID" == "0" ]; then
-# if [[ $SUDO_USER != "" ]]; then
-  echo -en "\nroot user detected. Typical installs should be done as a regular user.\r\n"
-  echo -en "If you are running this script using sudo, please cancel and rerun without sudo.\r\n"
-  echo -en "--nodered-user can be used to specify the user otherwise installation will happen under /root.\r\n"
-  echo -en "If you know what you are doing as root, please continue.\r\n\r\n"
-
-  yn="${CONFIRM_ROOT}"
-  [ ! "${yn}" ] && read -t 10 -p "Are you really sure you want to install as root ? (y/N) ? " yn
-  case $yn in
-    [Yy]* )
-    ;;
-    * )
-      echo " "
-      exit 1
-    ;;
-  esac
-  SUDO=''
-  SUDOE=''
-  id -u nobody &>/dev/null || adduser --no-create-home --shell /dev/null --disabled-password --disabled-login --gecos '' nobody &>/dev/null
-else
-    groups "$USER" | grep -q '\bsudo\b' && GRS="Y" || GRS="N"
-    if [[ "$GRS" == "N" ]]; then
-        echo "User $USER not in sudoers group. Exiting"
-        exit 1;
-    fi
-fi
-
 # setup user, home and group
 if [[ "$NODERED_USER" == "" ]]; then
     NODERED_HOME=$HOME
