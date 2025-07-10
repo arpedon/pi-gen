@@ -6,7 +6,7 @@ if [[ "$DEBUG" == "true" ]]; then
 fi
 # Constants
 NETWORK_CONFIG_DIR="/etc/systemd/network"
-NETWORK_CONFIG_FILE="$NETWORK_CONFIG_DIR/10-static.network"
+NETWORK_CONFIG_FILE="$NETWORK_CONFIG_DIR/10-eth0.network"
 BACKUP_FILE="$NETWORK_CONFIG_FILE.bak"
 PING_TARGET="8.8.8.8"
 
@@ -67,7 +67,7 @@ DNS=$dns
 EOF
 
   echo "New network configuration applied."
-  sudo systemctl restart systemd-networkd
+  sudo systemctl restart systemd-networkd systemd-networkd-wait-online
 }
 
 # Test the network connection

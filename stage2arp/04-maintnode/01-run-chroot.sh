@@ -1,15 +1,15 @@
 #!/bin/bash -e
 set -ex
 
-cd "/home/$FIRST_USER_NAME/maintnode"
-
 # ULDAQ
-cd "/home/$FIRST_USER_NAME/"
-tar -xvf uldaq.tar.gz
-cd libuldaq-1.2.0
+cd "/home/$FIRST_USER_NAME/libuldaq-1.2.1"
+echo "Building and installing uldaq library"
+echo
 ./configure && make && make install
-rm uldaq.tar.gz
-rm -rf libuldaq-1.2.0
+echo
+
+rm "/home/$FIRST_USER_NAME/libuldaq-1.2.1.tar.bz2"
+rm -rf "/home/$FIRST_USER_NAME/libuldaq-1.2.1"
 
 # DaqHATs
 cd "/home/$FIRST_USER_NAME/daqhats"
@@ -45,5 +45,18 @@ if [ $? -ne 0 ]; then
 fi
 make -C tools clean
 
+rm -rf "/home/$FIRST_USER_NAME/daqhats"
+
+sed -i '/^SYS=\/sys\/class\/i2c-adapter\/i2c-\$BUS$/{
+    s/.*/SYS=\/sys\/class\/i2c-adapter\/i2c-\$BUS\
+if [ ! -d "\$SYS" ]; then\
+   SYS=\/sys\/class\/i2c-dev\/i2c-\$BUS\/device\
+fi/
+}' "/usr/local/bin/daqhats_read_eeproms"
+
+
+chown -R ${FIRST_USER_NAME}:${FIRST_USER_NAME} /home/${FIRST_USER_NAME}/maintnode
+
 cd "/home/$FIRST_USER_NAME/maintnode"
-sudo -u ${FIRST_USER_NAME} -H bash -c "cd /home/${FIRST_USER_NAME}/maintnode-local-db && poetry install --only main"
+sudo -u ${FIRST_USER_NAME} -H bash -c "cd /home/${FIRST_USER_NAME}/maintnode && poetry install --only main"
+

@@ -1,0 +1,14 @@
+diff --git a/tools/daqhats_read_eeproms b/tools/daqhats_read_eeproms
+index f8c90f5..747006a 100755
+--- a/tools/daqhats_read_eeproms
++++ b/tools/daqhats_read_eeproms
+@@ -63,6 +63,9 @@ if [ "$rc" != 0 ]; then
+ fi
+ 
+ SYS=/sys/class/i2c-adapter/i2c-$BUS
++if [ ! -d "$SYS" ]; then
++   SYS=/sys/class/i2c-dev/i2c-$BUS/device
++fi
+ 
+ rm -f /etc/mcc/hats/*.bin
+ 

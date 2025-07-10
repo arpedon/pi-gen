@@ -10,6 +10,7 @@ sudo -u ${FIRST_USER_NAME} -H bash -c "cd /home/${FIRST_USER_NAME}/maintnode-loc
 export MAINTNODE_LOCAL_DB_BIN_PATH=$(sudo -u ${FIRST_USER_NAME} -H bash -c "cd /home/${FIRST_USER_NAME}/maintnode-local-db && poetry env info -p")/bin
 
 mkdir -p "/media/data"
+chown -R  pi:www-data /media/data 
 
 for file in $(ls systemd); do
   envsubst '$MAINTNODE_LOCAL_DB_BIN_PATH$FIRST_USER_NAME' < "systemd/$file" | sudo tee "/etc/systemd/system/$file" > /dev/null

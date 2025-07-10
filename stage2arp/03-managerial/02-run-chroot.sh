@@ -15,3 +15,10 @@ fi
 
 # Add the line to /etc/rc.local before "exit 0"
 sed -i '/^exit 0/i iptables-restore < /etc/iptables.ipv4.nat' /etc/rc.local
+
+# Disable NetworkManager
+systemctl disable NetworkManager
+systemctl mask NetworkManager
+
+# Enable systemd-networkd and systemd-networkd-wait-online
+systemctl enable systemd-networkd systemd-networkd-wait-online
