@@ -59,4 +59,5 @@ def run_network_setup():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    # Serve on port 80 for captive portal HTTP
+    app.run(host="0.0.0.0", port=80)
