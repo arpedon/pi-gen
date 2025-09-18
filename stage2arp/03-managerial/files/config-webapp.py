@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+import os
 import subprocess
 
 app = Flask(__name__)
@@ -13,49 +14,85 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/run-maintnode-setup", methods=["POST"])
-def run_maintnode_setup():
-    uuid = request.form.get("uuid")
-    server = request.form.get("server")
+def _script_exists(path: str) -> bool:
+    return os.path.isfile(path) and os.access(path, os.X_OK)
 
-    if not uuid or not server:
-        return jsonify({"error": "Both UUID and Server are required."}), 400
 
+def _run_script(argv):
     try:
         result = subprocess.run(
-            [MAINTNODE_SETUP_SCRIPT, uuid, server],
+            argv,
             capture_output=True,
             text=True,
-            check=True,
+            check=False,
         )
-        return jsonify({"output": result.stdout})
-    except subprocess.CalledProcessError as e:
-        return jsonify({"error": e.stderr}), 500
+        payload = {
+            "argv": argv,
+            "returncode": result.returncode,
+            "stdout": result.stdout.strip(),
+            "stderr": result.stderr.strip(),
+        }
+        status = 200 if result.returncode == 0 else 400
+        return jsonify(payload), status
+    except FileNotFoundError as e:
+        return (
+            jsonify({
+                "argv": argv,
+                "error": f"Executable not found: {e}",
+            }),
+            500,
+        )
+    except Exception as e:
+        return (
+            jsonify({
+                "argv": argv,
+                "error": f"Unexpected error: {e}",
+            }),
+            500,
+        )
+
+
+@app.route("/run-maintnode-setup", methods=["POST"])
+def run_maintnode_setup():
+    uuid = request.form.get("uuid", "").strip()
+    mechbase_url = request.form.get("server", "").strip()
+    tailscale_key = request.form.get("tailscale_key", "").strip()
+    readonly = request.form.get("readonly", "true").strip() or "true"
+
+    if not _script_exists(MAINTNODE_SETUP_SCRIPT):
+        return jsonify({"error": f"Script not found or not executable: {MAINTNODE_SETUP_SCRIPT}"}), 500
+
+    if not uuid:
+        return jsonify({"error": "uuid is required"}), 400
+
+    argv = [
+        MAINTNODE_SETUP_SCRIPT,
+        f"--maintnode-config-uuid={uuid}",
+        f"--readonly-filesystem={readonly}",
+    ]
+    if tailscale_key:
+        argv.append(f"--tailscale-auth-key={tailscale_key}")
+    if mechbase_url:
+        argv.append(f"--mechbase-url={mechbase_url}")
+
+    return _run_script(argv)
 
 
 @app.route("/run-network-setup", methods=["POST"])
 def run_network_setup():
-    ip = request.form.get("ip")
-    netmask = request.form.get("netmask")
-    gateway = request.form.get("gateway")
-    dns = request.form.get("dns")
+    ip = (request.form.get("ip", "").strip())
+    netmask = (request.form.get("netmask", "").strip())
+    gateway = (request.form.get("gateway", "").strip())
+    dns = (request.form.get("dns", "").strip())
+
+    if not _script_exists(NETWORK_SETUP_SCRIPT):
+        return jsonify({"error": f"Script not found or not executable: {NETWORK_SETUP_SCRIPT}"}), 500
 
     if not ip or not netmask or not gateway or not dns:
-        return (
-            jsonify({"error": "All fields (IP, Netmask, Gateway, DNS) are required."}),
-            400,
-        )
+        return jsonify({"error": "All fields (ip, netmask, gateway, dns) are required."}), 400
 
-    try:
-        result = subprocess.run(
-            [NETWORK_SETUP_SCRIPT, ip, netmask, gateway, dns],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        return jsonify({"output": result.stdout})
-    except subprocess.CalledProcessError as e:
-        return jsonify({"error": e.stderr}), 500
+    argv = [NETWORK_SETUP_SCRIPT, ip, netmask, gateway, dns]
+    return _run_script(argv)
 
 
 if __name__ == "__main__":

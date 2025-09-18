@@ -16,16 +16,16 @@ PING_TARGET="8.8.8.8"
 
 # Print usage instructions
 print_usage() {
-  echo "Usage: $0 --maintnode-config-uuid=<uuid> [--mechbase-url=<url>] --tailscale-auth-key=<key> [--readonly-filesystem=<true|false>]"
+  echo "Usage: $0 --maintnode-config-uuid=<uuid> [--mechbase-url=<url>] [--tailscale-auth-key=<key>] [--readonly-filesystem=<true|false>]"
   echo "Required parameters:"
   echo "  --maintnode-config-uuid=<uuid>  UUID for maintnode configuration"
-  echo "  --tailscale-auth-key=<key>      Tailscale authentication key"
   echo "Optional parameters:"
+  echo "  --tailscale-auth-key=<key>      Tailscale authentication key (omit to skip Tailscale setup)"
   echo "  --mechbase-url=<url>            Mechbase server URL (default: $DEFAULT_MECHBASE_SERVER)"
   echo "  --readonly-filesystem=<bool>    Enable readonly filesystem overlay (default: true)"
   echo ""
   echo "Example:"
-  echo "  $0 --maintnode-config-uuid=12345678-1234-1234-1234-123456789abc --tailscale-auth-key=tskey-auth-xxx --mechbase-url=https://custom.server.com --readonly-filesystem=false"
+  echo "  $0 --maintnode-config-uuid=12345678-1234-1234-1234-123456789abc --mechbase-url=https://custom.server.com --readonly-filesystem=false"
 }
 
 # Validate UUID format
@@ -170,20 +170,18 @@ if [[ -z "$MAINTNODE_CONFIG_UUID" ]]; then
   exit 1
 fi
 
-if [[ -z "$TAILSCALE_AUTH_KEY" ]]; then
-  echo "Error: --tailscale-auth-key parameter is required."
-  print_usage
-  exit 1
-fi
-
 validate_uuid "$MAINTNODE_CONFIG_UUID"
 validate_url "$MECHBASE_SERVER"
 
 # Check internet connection
 check_internet_connection
 
-# Setup Tailscale
-setup_tailscale "$TAILSCALE_AUTH_KEY"
+# Setup Tailscale (optional)
+if [[ -n "$TAILSCALE_AUTH_KEY" ]]; then
+  setup_tailscale "$TAILSCALE_AUTH_KEY"
+else
+  echo "No Tailscale key provided; skipping Tailscale setup."
+fi
 
 # Setup FRPC
 setup_frpc "$HOSTNAME"

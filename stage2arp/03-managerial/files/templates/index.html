@@ -12,8 +12,14 @@
     <form id="maintnode-form">
         <label for="uuid">UUID:</label>
         <input type="text" id="uuid" name="uuid" required><br>
+        <label for="tailscale_key">Tailscale Auth Key (optional):</label>
+        <input type="text" id="tailscale_key" name="tailscale_key"><br>
         <label for="server">Server:</label>
-        <input type="text" id="server" name="server" required><br>
+        <input type="text" id="server" name="server" placeholder="https://mechbase.arpedon.com"><br>
+        <label>
+            <input type="checkbox" id="readonly" name="readonly" checked>
+            Enable readonly filesystem overlay
+        </label><br>
         <button type="submit">Run Maintnode Setup</button>
     </form>
     <pre id="maintnode-output"></pre>
@@ -36,6 +42,12 @@
         document.getElementById("maintnode-form").addEventListener("submit", async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
+            // Ensure checkbox sends true/false
+            if (!formData.has("readonly")) {
+                formData.append("readonly", "false");
+            } else {
+                formData.set("readonly", "true");
+            }
             const response = await fetch("/run-maintnode-setup", {
                 method: "POST",
                 body: formData

@@ -1,5 +1,23 @@
+# /etc/systemd/network/10-wired.network
 [Match]
+# Match the NIC by MAC so renames (eth0/enpXsY) don’t break networking
+# MACAddress=aa:bb:cc:dd:ee:ff
 Name=eth0
+
+[Link]
+WakeOnLan=off
 
 [Network]
 DHCP=ipv4
+LLMNR=no
+MulticastDNS=no
+LinkLocalAddressing=no
+# Participate in wait-online; useful for services that need the network
+RequiredForOnline=yes
+
+[DHCPv4]
+UseDNS=yes
+UseNTP=yes
+RouteMetric=100
+ClientIdentifier=mac
+SendHostname=yes
