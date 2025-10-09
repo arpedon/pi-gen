@@ -3,7 +3,7 @@ from gpiozero import Button
 from signal import pause
 
 # GPIO 17 is active low
-hotspot_button = Button(17, pull_up=False, hold_time=8)  # Hold for 10 seconds to enable
+hotspot_button = Button(17, pull_up=True, hold_time=8)  # Hold for 10 seconds to enable
 hotspot_enabled = False  # Track the hotspot state
 
 

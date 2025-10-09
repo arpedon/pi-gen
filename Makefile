@@ -1,4 +1,12 @@
-export PIGEN_DOCKER_OPTS=-v /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock
+
+ifneq (,$(wildcard .env))
+  include .env
+  export $(shell sed -E 's/=.*//' .env)
+endif
+
+export PIGEN_DOCKER_OPTS=-v /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock \
+	-e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock \
+	-e TAILSCALE_AUTH_KEY=$(TAILSCALE_AUTH_KEY)
 
 clean: clean_skips
 	docker rm -v pigen_work || true
@@ -19,5 +27,6 @@ build: clean skip_stages
 	./build-docker.sh
 
 dev: skip_stages
-	CLEAN=1 PRESERVE_CONTAINER=1 CONTINUE=1 ./build-docker.sh && \
+	@echo "Using value: $$TAILSCALE_AUTH_KEY"
+	CLEAN=1 PRESERVE_CONTAINER=1 CONTINUE=1 TAILSCALE_AUTH_KEY=$$TAILSCALE_AUTH_KEY ./build-docker.sh && \
 	$(MAKE) skip_pre
