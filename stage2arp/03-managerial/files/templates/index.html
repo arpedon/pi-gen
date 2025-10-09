@@ -1,71 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Setup Scripts Frontend</title>
-</head>
-<body>
-    <h1>Setup Scripts Frontend</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Setup Maintnode</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: #21313c;
+        background-color: #f8f5f2;
+      }
+      
+      * {
+        box-sizing: border-box;
+      }
+      
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at top, #fefbfa, #f2ece7 55%, #ebdfd6);
+      }
+      
+      .page {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 56px 32px 64px;
+      }
+      
+      header {
+        text-align: center;
+        margin-bottom: 48px;
+      }
+      
+      header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        letter-spacing: -0.03em;
+      }
+      
+      header p {
+        margin: 12px auto 0;
+        max-width: 520px;
+        color: #506170;
+        line-height: 1.6;
+      }
+      
+      .forms-grid {
+        display: grid;
+        gap: 32px;
+      }
+      
+      .form-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid rgba(18, 51, 74, 0.08);
+        box-shadow: 0 18px 35px rgba(16, 46, 66, 0.12);
+        padding: 32px clamp(24px, 5vw, 48px);
+        display: grid;
+        gap: 24px;
+      }
+      
+      .form-card h2 {
+        margin: 0;
+        font-size: 1.6rem;
+      }
+      
+      .form-description {
+        color: #5f717f;
+        margin: 0;
+        line-height: 1.5;
+      }
+      
+      form {
+        display: grid;
+        gap: 18px;
+      }
+      
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+      
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.01em;
+      }
+      
+      .form-card input[type='text'] {
+        border: 1px solid rgba(33, 49, 60, 0.22);
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 1rem;
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+      }
+      
+      .form-card input[type='text']:focus {
+        outline: none;
+        border-color: #1f6feb;
+        box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.2);
+      }
+      
+      .checkbox-field {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(33, 49, 60, 0.12);
+        background: rgba(248, 245, 242, 0.7);
+      }
+      
+      .checkbox-field input[type='checkbox'] {
+        margin-top: 2px;
+        width: 18px;
+        height: 18px;
+        accent-color: #1f6feb;
+      }
+      
+      .checkbox-field span {
+        font-weight: 500;
+      }
+      
+      button[type='submit'] {
+        justify-self: start;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 24px;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(135deg, #1f6feb, #275fd5);
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 9px 18px rgba(39, 95, 213, 0.25);
+        transition: transform 120ms ease, box-shadow 120ms ease;
+      }
+      
+      button[type='submit']:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 24px rgba(39, 95, 213, 0.3);
+      }
+      
+      button[type='submit']:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(39, 95, 213, 0.35);
+      }
+      
+      .response {
+        border-radius: 14px;
+        border: 1px solid rgba(33, 49, 60, 0.14);
+        background: #f7f8fa;
+        padding: 16px;
+        font-family: 'SFMono-Regular', ui-monospace, 'Menlo', 'Courier New', monospace;
+        font-size: 0.92rem;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        word-break: break-word;
+        min-height: 62px;
+      }
+      
+      @media (min-width: 900px) {
+        .forms-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      
+        .form-card:nth-of-type(1) {
+          grid-column: span 2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <figure style="margin: 24px auto 0; width: 96px; height: 96px;">
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="96" height="96" viewBox="0 0 96 96" version="1.2" baseProfile="tiny-ps">
+            <title>Arpedon</title>
+            <g id="logos">
+              <g id="Group">
+                <g id="g1">
+                  <path id="Path" fill="#1b3a6a" stroke="none" d="M 80.467842 63.977596 L 53.74976 17.701759 C 51.19392 13.274559 44.803841 13.274559 42.248001 17.701439 L 35.568958 29.269119 L 35.57312 29.272003 C 35.484798 29.430397 35.430401 29.610237 35.430401 29.804802 C 35.430401 29.99968 35.485439 30.180161 35.574081 30.339203 L 35.569279 30.341125 L 60.434879 73.41024 L 60.43808 73.408318 C 60.632004 73.725121 60.977921 73.938881 61.37664 73.938881 L 74.716476 73.938881 C 79.828796 73.93856 83.023682 68.4048 80.467842 63.977596 Z" />
+                  <path id="path1" fill="#cf2f3b" stroke="none" d="M 47.597439 52.422401 C 47.597439 52.11776 47.350399 51.87104 47.046078 51.87104 L 23.15904 51.87104 C 22.75168 51.87104 22.4 52.094398 22.20896 52.422718 L 22.204161 52.422081 L 15.60288 63.855362 C 14.99136 64.860161 14.63264 66.035843 14.63264 67.298241 C 14.63264 70.965439 17.605761 73.93856 21.273279 73.93856 C 21.27648 73.93856 21.27968 73.93792 21.282881 73.93792 L 21.282881 73.93856 L 34.623039 73.93856 C 35.041599 73.93856 35.401279 73.702721 35.588158 73.359039 L 35.59264 73.361923 L 47.523201 52.699841 C 47.523521 52.699841 47.597439 52.560959 47.597439 52.422401 Z" />
+                </g>
+              </g>
+            </g>
+          </svg>
+        </figure>
+        <h1>Setup</h1>
+        <p>Maintnode and Network provisioning right from the device.</p>
+      </header>
 
-    <h2>Maintnode Setup</h2>
-    <form id="maintnode-form">
-        <label for="uuid">UUID:</label>
-        <input type="text" id="uuid" name="uuid" required><br>
-        <label for="tailscale_key">Tailscale Auth Key (optional):</label>
-        <input type="text" id="tailscale_key" name="tailscale_key"><br>
-        <label for="server">Server:</label>
-        <input type="text" id="server" name="server" placeholder="https://mechbase.arpedon.com"><br>
-        <label>
-            <input type="checkbox" id="readonly" name="readonly" checked>
-            Enable readonly filesystem overlay
-        </label><br>
-        <button type="submit">Run Maintnode Setup</button>
-    </form>
-    <pre id="maintnode-output"></pre>
+      <div class="forms-grid">
+        <section class="form-card">
+          <div>
+            <h2>Maintnode Setup</h2>
+            <p class="form-description">Configure a fresh maintnode instance with the credentials it needs once it connects home.</p>
+          </div>
+          <form id="maintnode-form">
+            <div class="field">
+              <label for="uuid">Maintnode UUID</label>
+              <input type="text" id="uuid" name="uuid" required />
+            </div>
+            <div class="field">
+              <label for="tailscale_key">Tailscale Auth Key (optional)</label>
+              <input type="text" id="tailscale_key" name="tailscale_key" />
+            </div>
+            <div class="field">
+              <label for="server">Mechbase Server</label>
+              <input type="text" id="server" name="server" placeholder="https://mechbase.arpedon.com" />
+            </div>
+            <label class="checkbox-field" for="readonly">
+              <input type="checkbox" id="readonly" name="readonly" checked />
+              <span>Enable readonly filesystem overlay</span>
+            </label>
+            <button type="submit">Run Maintnode Setup</button>
+          </form>
+          <pre class="response" id="maintnode-output"></pre>
+        </section>
 
-    <h2>Network Setup</h2>
-    <form id="network-form">
-        <label for="ip">IP Address:</label>
-        <input type="text" id="ip" name="ip" required><br>
-        <label for="netmask">Netmask:</label>
-        <input type="text" id="netmask" name="netmask" required><br>
-        <label for="gateway">Gateway:</label>
-        <input type="text" id="gateway" name="gateway" required><br>
-        <label for="dns">DNS:</label>
-        <input type="text" id="dns" name="dns" required><br>
-        <button type="submit">Run Network Setup</button>
-    </form>
-    <pre id="network-output"></pre>
+        <section class="form-card">
+          <div>
+            <h2>Network Setup</h2>
+            <p class="form-description">Apply static network settings so the maintnode knows where to report in.</p>
+          </div>
+          <form id="network-form">
+            <div class="field">
+              <label for="ip">IP Address</label>
+              <input type="text" id="ip" name="ip" required />
+            </div>
+            <div class="field">
+              <label for="netmask">Netmask</label>
+              <input type="text" id="netmask" name="netmask" required />
+            </div>
+            <div class="field">
+              <label for="gateway">Gateway</label>
+              <input type="text" id="gateway" name="gateway" required />
+            </div>
+            <div class="field">
+              <label for="dns">DNS</label>
+              <input type="text" id="dns" name="dns" required />
+            </div>
+            <button type="submit">Run Network Setup</button>
+          </form>
+          <pre class="response" id="network-output"></pre>
+        </section>
+      </div>
+    </div>
 
     <script>
-        document.getElementById("maintnode-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            // Ensure checkbox sends true/false
-            if (!formData.has("readonly")) {
-                formData.append("readonly", "false");
-            } else {
-                formData.set("readonly", "true");
-            }
-            const response = await fetch("/run-maintnode-setup", {
-                method: "POST",
-                body: formData
-            });
-            const result = await response.json();
-            document.getElementById("maintnode-output").textContent = JSON.stringify(result, null, 2);
-        });
-
-        document.getElementById("network-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const response = await fetch("/run-network-setup", {
-                method: "POST",
-                body: formData
-            });
-            const result = await response.json();
-            document.getElementById("network-output").textContent = JSON.stringify(result, null, 2);
-        });
+      document.getElementById('maintnode-form').addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const formData = new FormData(e.target)
+        // Ensure checkbox sends true/false
+        if (!formData.has('readonly')) {
+          formData.append('readonly', 'false')
+        } else {
+          formData.set('readonly', 'true')
+        }
+        const response = await fetch('/run-maintnode-setup', {
+          method: 'POST',
+          body: formData
+        })
+        const result = await response.json()
+        document.getElementById('maintnode-output').textContent = JSON.stringify(result, null, 2)
+      })
+      
+      document.getElementById('network-form').addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const formData = new FormData(e.target)
+        const response = await fetch('/run-network-setup', {
+          method: 'POST',
+          body: formData
+        })
+        const result = await response.json()
+        document.getElementById('network-output').textContent = JSON.stringify(result, null, 2)
+      })
     </script>
-</body>
+  </body>
 </html>
