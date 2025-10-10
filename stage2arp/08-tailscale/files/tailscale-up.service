@@ -1,0 +1,13 @@
+[Unit]
+Description=Tailscale Login (first boot or after reset)
+Wants=network-online.target
+After=network-online.target tailscaled.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/tailscale/auth.env
+ExecStart=/usr/bin/tailscale up --hostname=%H --ssh --accept-routes --authkey=${TAILSCALE_AUTH_KEY} 
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

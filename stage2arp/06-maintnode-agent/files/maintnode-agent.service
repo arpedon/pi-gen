@@ -1,0 +1,11 @@
+[Unit]
+Description=MaintNode agent
+
+[Service]
+User=${FIRST_USER_NAME}
+Group=www-data
+WorkingDirectory=/home/${FIRST_USER_NAME}
+ExecStart=/usr/local/bin/maintnode-agent $MECHBASE_SERVER/api/maintnode-configs/$MAINTNODE_CONFIG_UUID /home/${FIRST_USER_NAME}/config/maintnode.yaml
+
+[Install]
+WantedBy=multi-user.target

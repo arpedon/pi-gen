@@ -1,0 +1,2 @@
+gcc g++ make libusb-1.0-0-dev autoconf automake
+gpiod libgpiod-dev libgtk-3-dev

@@ -1,0 +1,12 @@
+[Unit]
+Description=Configure hostapd SSID from current hostname
+After=local-fs.target
+ConditionPathExists=/etc/hostapd/hostapd.conf.template
+ConditionPathExists=!/var/lib/hostapd/ssid-configured
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/render-hostapd-ssid
+
+[Install]
+WantedBy=multi-user.target
